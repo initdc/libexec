@@ -30,13 +30,22 @@ module Libexec
     end
 
     def code(cmd, *opt, **args)
-      catch_error = opt.nil? || args[:catch_error] || false
-      code = opt[0] || args[:code]
+      catch_error = !opt.empty? || args[:catch_error] || false
+      code = opt[0] || args[:code] || 1
 
-      # https://docs.ruby-lang.org/en/master/Kernel.html#method-i-system
-      result = system cmd
-      exit code if catch_error && !result
-      result
+      # https://docs.ruby-lang.org/en/master/Process.html#method-c-last_status
+      Process.spawn(cmd)
+      Process.wait
+
+      result = $?.exitstatus.zero?
+
+      if catch_error && !result
+        exit code
+      else
+        $?.exitstatus
+      end
+    rescue Errno::ENOENT => _e
+      127
     end
 
     def output(cmd)
