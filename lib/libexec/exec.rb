@@ -2,17 +2,40 @@
 
 module Libexec
   module Exec
-    def run(cmd)
+    def run(cmd, *argv, env: {}, mode: "r", **opts)
+      unless argv.empty?
+        cmd = [cmd]
+        argv.each do |arg|
+          # https://docs.ruby-lang.org/en/master/Kernel.html#method-i-class
+          if arg.instance_of?(Array)
+            cmd.concat(arg)
+          elsif arg.instance_of?(String)
+            cmd.push(arg)
+          end
+        end
+      end
+
       # https://docs.ruby-lang.org/en/master/IO.html#method-c-popen
-      IO.popen(cmd) do |pipe|
+      IO.popen(env, cmd, mode, opts) do |pipe|
         print pipe.gets until pipe.eof?
       end
       nil
     end
 
-    def each_line(cmd, &block)
+    def each_line(cmd, *argv, env: {}, mode: "r", **opts, &block)
+      unless argv.empty?
+        cmd = [cmd]
+        argv.each do |arg|
+          if arg.instance_of?(Array)
+            cmd.concat(arg)
+          elsif arg.instance_of?(String)
+            cmd.push(arg)
+          end
+        end
+      end
+
       # https://docs.ruby-lang.org/en/master/IO.html#method-i-each_line
-      IO.popen(cmd) do |pipe|
+      IO.popen(env, cmd, mode, opts) do |pipe|
         pipe.each_line(&block)
       end
     end
@@ -48,7 +71,20 @@ module Libexec
       127
     end
 
-    def output(cmd)
+    def output(cmd, *argv)
+      unless argv.empty?
+        arr = [cmd]
+        argv.each do |arg|
+          if arg.instance_of?(Array)
+            arr.push("'#{arg.join(" ")}'")
+          elsif arg.instance_of?(String)
+            arr.push(arg)
+          end
+        end
+
+        cmd = arr.join(" ")
+      end
+
       # https://docs.ruby-lang.org/en/master/Kernel.html#method-i-60
       output = `#{cmd}`
       output.chomp
