@@ -12,21 +12,21 @@ module Libexec
 
     def each_line(cmd, &block)
       # https://docs.ruby-lang.org/en/master/IO.html#method-i-each_line
-      IO.popen(cmd) do |r|
-        r.each_line(&block)
+      IO.popen(cmd) do |pipe|
+        pipe.each_line(&block)
       end
     end
 
     def by_ls_1(dir)
       arr = []
-      Libexec.each_line("ls -1 #{dir}") do |line|
+      each_line("ls -1 #{dir}") do |line|
         arr.push line.chomp
       end
       arr
     end
 
     def each_ls_1(dir, &block)
-      Libexec.each_line("ls -1 #{dir}", &block)
+      each_line("ls -1 #{dir}", &block)
     end
 
     def code(cmd, *opt, **args)
