@@ -22,7 +22,9 @@ jobs:
     strategy:
       matrix:
         ruby:
+          - '2.6.0'
           - '2.7.0'
+          - '3.0.0'
 
     steps:
     - uses: actions/checkout@v3
