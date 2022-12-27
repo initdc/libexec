@@ -51,9 +51,25 @@ module Libexec
     # {https://docs.ruby-lang.org/en/master/Process.html#method-c-last_status link}
     #
     # @return [Integer]
-    def code(cmd, *opt, **args)
-      catch_error = !opt.empty? || args[:catch_error] || false
-      code = opt[0] || args[:code] || 1
+    def code(*argv, **opts)
+      catch_error = opts[:catch_error]
+      code = opts[:code]
+
+      if argv.size < 2
+        catch_error ||= false
+        code ||= 1
+
+        cmd = _js_style_cmd(argv)
+      else
+        is_integer = argv.last.instance_of?(Integer)
+
+        catch_error ||= is_integer
+        code ||= (argv.last if is_integer) || 1
+
+        args = argv.clone
+        args.pop
+        cmd = is_integer ? _js_style_cmd(args) : _js_style_cmd(argv)
+      end
 
       Process.spawn(cmd)
       Process.wait
