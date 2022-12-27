@@ -29,9 +29,9 @@ module Libexec
       each_line("ls -1 #{dir}", &block)
     end
 
-    def code(cmd, *opt, **args)
-      catch_error = !opt.empty? || args[:catch_error] || false
-      code = opt[0] || args[:code] || 1
+    def code(cmd, code = nil, **opts)
+      catch_error = code.instance_of?(Integer) || opts[:catch_error] || false
+      code ||= opts[:code] || 1
 
       # https://docs.ruby-lang.org/en/master/Process.html#method-c-last_status
       Process.spawn(cmd)
