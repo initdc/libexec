@@ -30,11 +30,11 @@ module Libexec
 
     # wrapper for `ls -1` which will be often used
     #
-    # @param [String] dir
-    # @return [Array] arr
-    def by_ls_1(dir)
+    # @param  [Array] argv
+    # @return [Array] line.chomp
+    def by_ls_1(*argv, **opts)
       arr = []
-      each_line("ls -1 #{dir}") do |line|
+      each_line("ls", "-1", argv, opts: opts) do |line|
         arr.push line.chomp
       end
       arr
@@ -42,9 +42,9 @@ module Libexec
 
     # Operate each line result by yourself in `ls -1`
     #
-    # @param [String] dir
-    def each_ls_1(dir, &block)
-      each_line("ls -1 #{dir}", &block)
+    # @param [Array] argv
+    def each_ls_1(*argv, **opts, &block)
+      each_line("ls", "-1", argv, opts: opts, &block)
     end
 
     # wrapper for Process.spawn
