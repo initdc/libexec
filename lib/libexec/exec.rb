@@ -34,7 +34,8 @@ module Libexec
     # @return [Array] line.chomp
     def by_ls_1(*argv, **opts)
       arr = []
-      each_line("ls", "-1", argv, opts: opts) do |line|
+      argv.unshift(["ls", "-1"])
+      each_line(argv, opts: opts) do |line|
         arr.push line.chomp
       end
       arr
@@ -44,7 +45,8 @@ module Libexec
     #
     # @param [Array] argv
     def each_ls_1(*argv, **opts, &block)
-      each_line("ls", "-1", argv, opts: opts, &block)
+      argv.unshift(["ls", "-1"])
+      each_line(argv, opts: opts, &block)
     end
 
     # wrapper for Process.spawn
@@ -110,19 +112,7 @@ module Libexec
     def _ruby_style_cmd(argv)
       cmd, *args = argv
 
-      unless args.empty?
-        arr = [cmd]
-        args.each do |arg|
-          # https://docs.ruby-lang.org/en/master/Kernel.html#method-i-class
-          if arg.instance_of?(Array)
-            arr.concat(arg)
-          elsif arg.instance_of?(String)
-            arr.push(arg)
-          end
-        end
-        cmd = arr
-      end
-      cmd
+      args.empty? ? cmd : argv.flatten
     end
 
     # in JS style, all arg connect with " " <br>
@@ -140,7 +130,7 @@ module Libexec
         args.each do |arg|
           if arg.instance_of?(Array)
             arr.push(%('#{arg.join(" ")}'))
-          elsif arg.instance_of?(String)
+          else
             arr.push(arg)
           end
         end
