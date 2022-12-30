@@ -54,25 +54,19 @@ module Libexec
     #
     # @return [Integer]
     def code(*argv, **opts)
-      catch_error = opts[:catch_error]
-      code = opts[:code]
+      opt_catch_error = opts[:catch_error]
+      opt_code = opts[:code]
 
-      if argv.size < 2
-        catch_error ||= false
-        code ||= 1
+      *args, last_arg = argv
 
-        cmd = _js_style_cmd(argv)
-      else
-        is_integer = argv.last.instance_of?(Integer)
+      is_integer = last_arg.instance_of?(Integer)
+      arg_catch_error = is_integer
+      arg_code = is_integer ? last_arg : false
+      
+      catch_error = arg_catch_error|| opt_catch_error || false
+      code = arg_code || opt_code || 1
 
-        catch_error ||= is_integer
-        code ||= (argv.last if is_integer) || 1
-
-        args = argv.clone
-        args.pop
-        cmd = is_integer ? _js_style_cmd(args) : _js_style_cmd(argv)
-      end
-
+      cmd = is_integer ? _js_style_cmd(args) : _js_style_cmd(argv)
       Process.spawn(cmd)
       Process.wait
 
