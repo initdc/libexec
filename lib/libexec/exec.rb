@@ -62,20 +62,21 @@ module Libexec
       is_integer = last_arg.instance_of?(Integer)
       arg_catch_error = is_integer
       arg_code = is_integer ? last_arg : false
-      
-      catch_error = arg_catch_error|| opt_catch_error || false
+
+      catch_error = arg_catch_error || opt_catch_error || false
       code = arg_code || opt_code || 1
 
       cmd = is_integer ? _js_style_cmd(args) : _js_style_cmd(argv)
       Process.spawn(cmd)
       Process.wait
 
-      result = $?.exitstatus.zero?
+      original_code = $?.exitstatus
+      result = original_code.zero?
 
       if catch_error && !result
         exit code
       else
-        $?.exitstatus
+        original_code
       end
     rescue Errno::ENOENT => _e
       127
