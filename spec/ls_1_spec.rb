@@ -9,6 +9,10 @@ RSpec.describe Libexec::Exec do
     expect(Libexec.by_ls_1("bin", "sig")).to eq ["bin:", "console", "setup", "", "sig:", "libexec.rbs"]
   end
 
+  it "by_ls_1 dir1/* got dirs/files" do
+    expect(Libexec.by_ls_1("bin/*")).to eq ["bin/console", "bin/setup"]
+  end
+
   it "each_ls_1 dir got files" do
     arr = []
     Libexec.each_ls_1 "bin" do |line|
