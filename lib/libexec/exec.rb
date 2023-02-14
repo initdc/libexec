@@ -45,6 +45,30 @@ module Libexec
       arr
     end
 
+    def by_each_line(*argv, env: {}, mode: "r", **opts)
+      arr = []
+      cmd = _ruby_style_cmd(argv)
+
+      IO.popen(env, cmd, mode, opts) do |pipe|
+        pipe.each_line do |line|
+          arr.push(line)
+        end
+      end
+      arr
+    end
+
+    def by_each_chomp(*argv, env: {}, mode: "r", **opts)
+      arr = []
+      cmd = _ruby_style_cmd(argv)
+
+      IO.popen(env, cmd, mode, opts) do |pipe|
+        pipe.each_line do |line|
+          arr.push(line.chomp)
+        end
+      end
+      arr
+    end
+
     # Operate each line result by yourself in `ls -1`
     #
     # @param [Array] argv

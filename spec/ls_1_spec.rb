@@ -5,6 +5,14 @@ RSpec.describe Libexec::Exec do
     expect(Libexec.by_ls_1("bin")).to eq %w[console setup]
   end
 
+  it "by_each_chomp dir got files" do
+    expect(Libexec.by_each_chomp("ls -1 bin")).to eq %w[console setup]
+  end
+
+  it "by_each_line dir got files" do
+    expect(Libexec.by_each_line("ls -1 bin")).to eq %W[console\n setup\n]
+  end
+
   it "by_ls_1 dir1, dir2 got dirs and files" do
     expect(Libexec.by_ls_1("bin", "sig")).to eq ["bin:", "console", "setup", "", "sig:", "libexec.rbs"]
   end
